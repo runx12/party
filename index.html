@@ -332,7 +332,8 @@ const EVENT = {
   ],
   footwear: 'Unsafe footwear, including but not limited to high heels, leather soles, novelty skate shoes, platform shoes, wedge-style shoes, and bare feet, is not safe and is prohibited on board any vessel.',
   footwearTip: 'Flat, rubber-soled shoes like sneakers or boat shoes are your best bet.',
-  offices: ['Riverside', 'Newport Beach', 'Orange County', 'Other'],
+  offices: ['Orange County', 'Riverside', 'Other'],
+  defaultOffice: 'Orange County',
   showHeadcount: true,
 };
 /* =========================================================== */
@@ -355,7 +356,8 @@ function render(){
   $('footwearText').textContent = EVENT.footwear;
   $('footwearTip').textContent = EVENT.footwearTip;
   $('successFootwear').textContent = EVENT.footwear;
-  $('office').innerHTML = '<option value="">Select…</option>' + EVENT.offices.map(o => `<option>${esc(o)}</option>`).join('');
+  $('office').innerHTML = EVENT.offices.map(o => `<option>${esc(o)}</option>`).join('');
+  $('office').value = EVENT.defaultOffice;
   countdown();
 }
 
@@ -394,7 +396,8 @@ function openRsvp(v){
   setAttending(v);
   try { // prefill from a previous RSVP on this device
     const saved = JSON.parse(localStorage.getItem('xii-party-rsvp') || 'null');
-    if (saved) ['name','email','phone','office'].forEach(k => { if (saved[k] && !$(k).value) $(k).value = saved[k]; });
+    if (saved) ['name','email','phone'].forEach(k => { if (saved[k] && !$(k).value) $(k).value = saved[k]; });
+    if (saved && EVENT.offices.includes(saved.office)) $('office').value = saved.office;
   } catch (e) {}
   $('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
