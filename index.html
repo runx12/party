@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holiday Boat Party VI — RSVP</title>
+<meta name="description" content="Holiday Boat Party VI · Newport Harbor · Dec 12. RSVP by Dec 5.">
+<style>
+:root{
+  /* Palette pulled from the flyer */
+  --bg:#0E1F3F;            /* flyer night-sky navy */
+  --bg-deep:#0A1730;
+  --off-white:#F8F9F9;
+  --pink:#E8509E;          /* lettering magenta */
+  --orange:#F59E4E;        /* lettering orange */
+  --purple:#7A2FB8;        /* lettering outline */
+  --grad:linear-gradient(90deg,var(--pink),var(--orange));
+  --text-muted:rgba(248,249,249,.62);
+  --border:rgba(232,80,158,.24);
+  --border2:rgba(232,80,158,.1);
+  --card-bg:rgba(255,255,255,.05);
+  --btn-idle:#A9A6B8; --btn-border-idle:rgba(169,166,184,.45);
+  --amber:#EF9F27; --green:#2DC48E; --red:#F05252;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--off-white)}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;z-index:1000;pointer-events:none;opacity:.4;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.label{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange)}
+
+/* Header */
+.header{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);
+  height:65px;padding:0 36px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:baseline;gap:14px}
+.logo{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1}
+.brand-tag{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange)}
+
+/* Buttons */
+.btn{font-family:inherit;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:9px 18px;background:transparent;cursor:pointer;transition:all .15s;border-radius:0}
+.btn-primary{border:1px solid var(--pink);color:var(--pink)}
+.btn-primary:hover{background:var(--grad);border-color:transparent;color:var(--bg-deep)}
+.btn-secondary{border:1px solid var(--btn-border-idle);color:var(--btn-idle)}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+.btn-lg{font-size:11px;padding:16px 30px;letter-spacing:2.5px}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* Banner */
+.banner{position:relative;width:100%;line-height:0;border-bottom:1px solid var(--border)}
+.banner img{width:100%;height:auto;display:block}
+
+/* PRESS START — game title-screen button, sits on the star reflection in the water */
+.start-btn{position:absolute;left:80%;top:50%;transform:translate(-50%,-50%) skewX(-8deg);
+  font-family:inherit;font-style:italic;font-weight:900;text-transform:uppercase;line-height:1;
+  font-size:clamp(11px,2.3vw,38px);letter-spacing:.06em;
+  padding:.55em .9em .5em;cursor:pointer;border-radius:0;
+  background:rgba(8,10,28,.62);border:2px solid transparent;
+  background-clip:padding-box;
+  box-shadow:0 0 0 2px var(--pink),0 0 22px rgba(232,80,158,.55),0 0 46px rgba(245,158,78,.25);
+  display:flex;flex-direction:column;align-items:center;gap:.35em;transition:transform .15s,box-shadow .15s}
+.start-btn .big-txt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 6px rgba(232,80,158,.6));animation:blink 1.4s steps(1,end) infinite;white-space:nowrap}
+.start-btn .big-txt::before{content:"▶ ";font-size:.7em;vertical-align:.12em}
+.start-btn .small-txt{font-style:normal;font-size:.32em;letter-spacing:.35em;color:var(--off-white);opacity:.85;white-space:nowrap}
+.start-btn:hover,.start-btn:focus-visible{transform:translate(-50%,-50%) skewX(-8deg) scale(1.06);outline:none;
+  box-shadow:0 0 0 2px var(--orange),0 0 30px rgba(245,158,78,.7),0 0 60px rgba(232,80,158,.45)}
+.start-btn:hover .big-txt,.start-btn:focus-visible .big-txt{animation:none}
+@keyframes blink{0%,70%{opacity:1}70.01%,100%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.start-btn .big-txt{animation:none}}
+
+/* Action bar under banner */
+.action-bar{padding:26px 36px;border-bottom:1px solid var(--border);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.countdown{margin-left:8px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange)}
+.rsvp-by{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+
+/* Details grid */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)}
+.stat-card{padding:22px 28px;border-right:1px solid var(--border)}
+.stat-card:first-child{padding-left:36px}
+.stat-card:last-child{border-right:none}
+.stat-card .label{margin-bottom:8px}
+.stat-value{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1.2}
+.stat-sub{font-size:12px;color:var(--text-muted);margin-top:4px}
+.stat-sub a,.stat-value a{color:inherit;text-decoration:none}
+.stat-sub a{border-bottom:1px solid rgba(245,158,78,.5)}
+.stat-sub a:hover{color:var(--orange)}
+
+/* Content */
+.content{display:grid;grid-template-columns:1.2fr 1fr;border-bottom:1px solid var(--border);flex:1}
+.section{padding:40px 36px}
+.section + .section{border-left:1px solid var(--border)}
+.section h2{font-size:26px;font-weight:700;letter-spacing:-.5px;margin:10px 0 14px}
+.section p{color:rgba(248,249,249,.85);max-width:560px}
+.section p + p{margin-top:12px}
+.facts{list-style:none;margin-top:18px}
+.facts li{display:flex;gap:18px;padding:12px 0;border-bottom:1px solid var(--border2)}
+.facts li:last-child{border-bottom:none}
+.facts .k{flex:0 0 92px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pink);padding-top:3px}
+
+.warning{border:1px solid rgba(239,159,39,.55);background:rgba(239,159,39,.08);padding:22px 24px}
+.warning .label{color:var(--amber);display:flex;align-items:center;gap:8px}
+.warning h3{font-size:20px;font-weight:700;letter-spacing:-.3px;margin:8px 0 10px}
+.warning p{color:rgba(248,249,249,.88);font-size:14px}
+.warning .tip{margin-top:10px;color:var(--amber);font-size:13px;font-weight:600}
+
+.headcount{display:flex;gap:40px;margin-top:30px}
+.big{font-size:36px;font-weight:700;letter-spacing:-1px;line-height:1}
+.big.glow{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 10px rgba(232,80,158,.4))}
+
+/* Footer */
+.footer-bar{position:sticky;bottom:0;z-index:1;background:var(--bg);border-top:1px solid var(--border);
+  padding:11px 36px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.footer-count{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange)}
+.footer-brand{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(248,249,249,.25)}
+
+/* Modal */
+.overlay{position:fixed;inset:0;z-index:500;background:rgba(6,10,24,.8);backdrop-filter:blur(3px);
+  display:none;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow-y:auto}
+.overlay.open{display:flex;animation:fade .18s ease}
+.modal{width:100%;max-width:540px;background:var(--bg);border:1px solid var(--border);animation:rise .22s ease;box-shadow:0 0 60px rgba(232,80,158,.15)}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:24px 28px 18px;border-bottom:1px solid var(--border)}
+.modal-head h3{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-top:6px}
+.close{background:none;border:none;color:var(--btn-idle);font-size:22px;line-height:1;cursor:pointer;padding:4px}
+.close:hover{color:var(--pink)}
+.modal-body{padding:22px 28px 26px}
+.field{margin-bottom:16px}
+.field > label:not(.check-field){display:block;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:7px}
+.field label .opt{color:rgba(248,249,249,.3);letter-spacing:1px}
+.field input,.field select,.field textarea{width:100%;font-family:inherit;font-size:15px;color:var(--off-white);
+  background:var(--card-bg);border:1px solid var(--border);border-radius:0;padding:11px 13px;outline:none;transition:border-color .15s}
+.field textarea{resize:vertical;min-height:72px}
+.field select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--orange) 50%),linear-gradient(135deg,var(--orange) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+.field select option{background:var(--bg)}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink)}
+.field.invalid input{border-color:var(--red)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.toggle button{font-family:inherit;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:12px;
+  background:transparent;border:1px solid var(--btn-border-idle);color:var(--btn-idle);cursor:pointer;border-radius:0;transition:all .15s}
+.toggle button:hover{border-color:var(--pink);color:var(--pink)}
+.toggle button.on-yes{border-color:var(--pink);color:var(--pink);background:rgba(232,80,158,.1)}
+.toggle button.on-no{border-color:var(--orange);color:var(--orange);background:rgba(245,158,78,.1)}
+.check-field{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid rgba(239,159,39,.45);background:rgba(239,159,39,.06);cursor:pointer;font-size:13px;line-height:1.45;color:rgba(248,249,249,.88)}
+.check-field input{margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--amber);cursor:pointer}
+.check-field strong{color:var(--amber)}
+.field.invalid .check-field{border-color:var(--red)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.hint{font-size:12px;color:var(--text-muted);margin-top:10px}
+.error{display:none;font-size:13px;color:var(--red);margin-bottom:14px}
+.error.show{display:block}
+.submit-row{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+.success{display:none;padding:40px 28px 34px;text-align:center}
+.success .check{width:52px;height:52px;margin:0 auto 18px;border:1px solid var(--green);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:22px}
+.success h3{font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px}
+.success p{color:var(--text-muted);margin-bottom:20px}
+.success .warning{text-align:left;margin:0 0 24px;padding:16px 18px}
+.success .warning p{color:rgba(248,249,249,.88);margin:6px 0 0;font-size:13px}
+
+@media (max-width:820px){
+  .header,.action-bar,.section,.footer-bar{padding-left:20px;padding-right:20px}
+  .stats-bar{grid-template-columns:1fr 1fr}
+  .stat-card,.stat-card:first-child{padding:18px 20px}
+  .stat-card:nth-child(2){border-right:none}
+  .stat-card:nth-child(-n+2){border-bottom:1px solid var(--border)}
+  .stat-value{font-size:18px}
+  .content{grid-template-columns:1fr}
+  .section + .section{border-left:none;border-top:1px solid var(--border)}
+  .brand-tag,.footer-brand{display:none}
+  .rsvp-by{margin-left:0;width:100%}
+  .row2{grid-template-columns:1fr}
+  .modal-head,.modal-body{padding-left:20px;padding-right:20px}
+  .start-btn{border-width:1px;box-shadow:0 0 0 1px var(--pink),0 0 12px rgba(232,80,158,.55)}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand"><span class="logo">original</span><span class="brand-tag">Holiday Boat Party VI</span></div>
+  <button class="btn btn-primary" onclick="openRsvp('Yes')">RSVP</button>
+</header>
+
+<section class="banner">
+  <img src="banner.jpg" alt="Twelve Holiday Boat Party VI — Newport Harbor, Dec 12th, arrive before 7:30 PM" width="2000" height="1119">
+  <button class="start-btn" onclick="openRsvp('Yes')" aria-label="RSVP">
+    <span class="big-txt">Press Start</span>
+    <span class="small-txt">to RSVP</span>
+  </button>
+</section>
+
+<section class="action-bar">
+  <button class="btn btn-primary btn-lg" onclick="openRsvp('Yes')">I'll be there</button>
+  <button class="btn btn-secondary btn-lg" onclick="openRsvp('No')">Can't make it</button>
+  <span class="countdown" id="countdown"></span>
+  <span class="rsvp-by">RSVP by <span class="js-rsvpby"></span></span>
+</section>
+
+<section class="stats-bar" id="details"></section>
+
+<main class="content">
+  <div class="section">
+    <div class="label">The details</div>
+    <h2 id="aboutHeading"></h2>
+    <div id="about"></div>
+    <ul class="facts" id="facts"></ul>
+  </div>
+  <div class="section">
+    <div class="warning">
+      <div class="label">⚠ Footwear rule</div>
+      <h3>Safe shoes only on board</h3>
+      <p id="footwearText"></p>
+      <p class="tip" id="footwearTip"></p>
+    </div>
+    <div class="headcount" id="headcount" hidden>
+      <div><div class="label">Going</div><div class="big glow" id="hcGoing">—</div></div>
+      <div><div class="label">With guests</div><div class="big" id="hcTotal">—</div></div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer-bar">
+  <span class="footer-count">RSVP by <span class="js-rsvpby"></span></span>
+  <span class="footer-brand">■ XII — BUILDING CULTURE FORWARD ■</span>
+</footer>
+
+<!-- RSVP modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeRsvp()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div id="formView">
+      <div class="modal-head">
+        <div><div class="label">RSVP</div><h3 id="modalTitle"></h3></div>
+        <button class="close" onclick="closeRsvp()" aria-label="Close">×</button>
+      </div>
+      <form class="modal-body" id="rsvpForm" novalidate>
+        <div class="field">
+          <label>Will you be there?</label>
+          <div class="toggle">
+            <button type="button" data-v="Yes" onclick="setAttending('Yes')">Yes, I'm in</button>
+            <button type="button" data-v="No" onclick="setAttending('No')">Can't make it</button>
+          </div>
+        </div>
+        <div class="field" id="fName">
+          <label for="name">Your full name</label>
+          <input id="name" name="name" autocomplete="name" required maxlength="80">
+        </div>
+        <div class="row2">
+          <div class="field" id="fEmail">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="120">
+          </div>
+          <div class="field" id="fPhone">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="30">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="office">Office</label>
+            <select id="office" name="office"></select>
+          </div>
+          <div class="field yes-only">
+            <label for="guests">Bringing a guest?</label>
+            <select id="guests" name="guests" onchange="syncGuest()">
+              <option value="0">Just me</option>
+              <option value="1">+1 guest</option>
+            </select>
+          </div>
+        </div>
+        <div class="field yes-only" id="fGuestName" style="display:none">
+          <label for="guestName">Guest's full name</label>
+          <input id="guestName" name="guestName" maxlength="80" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="notes">Notes <span class="opt">— optional</span></label>
+          <textarea id="notes" name="notes" maxlength="500" placeholder="Dietary needs, questions, anything else"></textarea>
+        </div>
+        <div class="field yes-only" id="fFootwear">
+          <label class="check-field">
+            <input type="checkbox" id="footwear">
+            <span><strong>I understand the footwear rules.</strong> No high heels, leather soles, novelty skate shoes, platforms, wedges, or bare feet on board — for me and my guest.</span>
+          </label>
+        </div>
+        <div class="hp" aria-hidden="true"><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+        <div class="error" id="formError"></div>
+        <div class="submit-row">
+          <button type="button" class="btn btn-secondary" onclick="closeRsvp()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">Send RSVP</button>
+        </div>
+        <p class="hint">Already RSVP'd? Submit again with the same email or phone to change your answer.</p>
+      </form>
+    </div>
+    <div class="success" id="successView">
+      <div class="check">✓</div>
+      <h3 id="successTitle"></h3>
+      <p id="successMsg"></p>
+      <div class="warning" id="successWarning">
+        <div class="label">⚠ Footwear reminder</div>
+        <p id="successFootwear"></p>
+      </div>
+      <button class="btn btn-primary" onclick="closeRsvp()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== EDIT THIS BLOCK ===================== */
+const SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // ends in /exec
+
+const EVENT = {
+  start:  '2026-12-12T19:30:00-08:00',   // used for the countdown
+  rsvpBy: 'Friday, Dec 5',
+  details: [
+    { label: 'Date',     value: 'Saturday, Dec 12', sub: '2026' },
+    { label: 'Time',     value: 'Arrive by 7:30 PM', sub: 'Doors close at 7:30 · Ends 10:00 PM' },
+    { label: 'Location', value: 'Newport Landing',  sub: '400 Main St., Newport Beach, CA 92661',
+      link: 'https://www.google.com/maps/search/?api=1&query=Newport+Landing+400+Main+St+Newport+Beach+CA+92661' },
+    { label: 'Dress',    value: 'Warm layers',      sub: "We'll be outdoors on the water" },
+  ],
+  aboutHeading: 'Dinner, drinks, awards, and music.',
+  about: [
+    'Plus-ones are welcome, but each employee is limited to one guest.',
+  ],
+  facts: [
+    { k: 'Food',   v: "Light hors d'oeuvres and small sandwiches" },
+    { k: 'Sweets', v: 'Dessert table' },
+    { k: 'Drinks', v: 'Cash bar for alcohol' },
+    { k: 'Guests', v: 'One guest per employee' },
+  ],
+  footwear: 'Unsafe footwear, including but not limited to high heels, leather soles, novelty skate shoes, platform shoes, wedge-style shoes, and bare feet, is not safe and is prohibited on board any vessel.',
+  footwearTip: 'Flat, rubber-soled shoes like sneakers or boat shoes are your best bet.',
+  offices: ['Riverside', 'Newport Beach', 'Orange County', 'Other'],
+  showHeadcount: true,
+};
+/* =========================================================== */
+
+const $ = id => document.getElementById(id);
+let attending = 'Yes';
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function render(){
+  document.querySelectorAll('.js-rsvpby').forEach(el => el.textContent = EVENT.rsvpBy);
+  $('aboutHeading').textContent = EVENT.aboutHeading;
+  $('about').innerHTML = EVENT.about.map(p => `<p>${esc(p)}</p>`).join('');
+  $('facts').innerHTML = EVENT.facts.map(f => `<li><span class="k">${esc(f.k)}</span><span>${esc(f.v)}</span></li>`).join('');
+  $('details').innerHTML = EVENT.details.map(d => {
+    const sub = d.sub ? (d.link ? `<a href="${esc(d.link)}" target="_blank" rel="noopener">${esc(d.sub)} ↗</a>` : esc(d.sub)) : '';
+    const val = d.link ? `<a href="${esc(d.link)}" target="_blank" rel="noopener">${esc(d.value)}</a>` : esc(d.value);
+    return `<div class="stat-card"><div class="label">${esc(d.label)}</div><div class="stat-value">${val}</div>${sub ? `<div class="stat-sub">${sub}</div>` : ''}</div>`;
+  }).join('');
+  $('footwearText').textContent = EVENT.footwear;
+  $('footwearTip').textContent = EVENT.footwearTip;
+  $('successFootwear').textContent = EVENT.footwear;
+  $('office').innerHTML = '<option value="">Select…</option>' + EVENT.offices.map(o => `<option>${esc(o)}</option>`).join('');
+  countdown();
+}
+
+function countdown(){
+  const days = Math.ceil((new Date(EVENT.start) - new Date()) / 864e5);
+  $('countdown').textContent = isNaN(days) ? '' : days > 1 ? `${days} days to go` : days === 1 ? 'Tomorrow' : days === 0 ? 'Tonight' : '';
+}
+
+async function loadHeadcount(){
+  if (!EVENT.showHeadcount || !SCRIPT_URL.startsWith('https://')) return;
+  try {
+    const d = await (await fetch(SCRIPT_URL)).json();
+    if (d.ok) { $('hcGoing').textContent = d.going; $('hcTotal').textContent = d.total; $('headcount').hidden = false; }
+  } catch (e) { /* headcount is optional — fail quietly */ }
+}
+
+function syncGuest(){
+  $('fGuestName').style.display = (attending === 'Yes' && $('guests').value === '1') ? '' : 'none';
+}
+
+function setAttending(v){
+  attending = v;
+  document.querySelectorAll('.toggle button').forEach(b => {
+    b.classList.remove('on-yes', 'on-no');
+    if (b.dataset.v === v) b.classList.add(v === 'Yes' ? 'on-yes' : 'on-no');
+  });
+  document.querySelectorAll('.yes-only').forEach(el => { if (el.id !== 'fGuestName') el.style.display = v === 'Yes' ? '' : 'none'; });
+  syncGuest();
+  $('modalTitle').textContent = v === 'Yes' ? "Let's get you on the boat." : "Sorry you'll miss it.";
+}
+
+function openRsvp(v){
+  $('formView').style.display = '';
+  $('successView').style.display = 'none';
+  $('formError').classList.remove('show');
+  setAttending(v);
+  try { // prefill from a previous RSVP on this device
+    const saved = JSON.parse(localStorage.getItem('xii-party-rsvp') || 'null');
+    if (saved) ['name','email','phone','office'].forEach(k => { if (saved[k] && !$(k).value) $(k).value = saved[k]; });
+  } catch (e) {}
+  $('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => $('name').focus(), 50);
+}
+
+function closeRsvp(){
+  $('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRsvp(); });
+
+function showError(msg){ $('formError').textContent = msg; $('formError').classList.add('show'); }
+
+$('rsvpForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  ['fName','fEmail','fPhone','fGuestName','fFootwear'].forEach(id => $(id).classList.remove('invalid'));
+  $('formError').classList.remove('show');
+
+  const yes = attending === 'Yes';
+  const guests = yes ? $('guests').value : '0';
+  const data = {
+    attending,
+    name:      $('name').value.trim(),
+    email:     $('email').value.trim(),
+    phone:     $('phone').value.trim(),
+    office:    $('office').value,
+    guests,
+    guestName: guests === '1' ? $('guestName').value.trim() : '',
+    notes:     $('notes').value.trim(),
+    footwear:  yes ? $('footwear').checked : false,
+    website:   $('website').value,
+  };
+
+  if (!data.name) { $('fName').classList.add('invalid'); return showError('Please enter your name.'); }
+  if (!data.email && !data.phone) { $('fEmail').classList.add('invalid'); $('fPhone').classList.add('invalid'); return showError('Please enter an email or phone number.'); }
+  if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) { $('fEmail').classList.add('invalid'); return showError('That email doesn\'t look right.'); }
+  if (guests === '1' && !data.guestName) { $('fGuestName').classList.add('invalid'); return showError('Please enter your guest\'s full name.'); }
+  if (yes && !data.footwear) { $('fFootwear').classList.add('invalid'); return showError('Please confirm you understand the footwear rules.'); }
+  if (!SCRIPT_URL.startsWith('https://')) return showError('RSVPs aren\'t connected yet — the page owner needs to add the Apps Script URL.');
+
+  const btn = $('submitBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    // text/plain avoids a CORS preflight, which Apps Script can't answer.
+    const r = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) });
+    let res;
+    try { res = await r.json(); } catch (_) { throw new Error('Couldn\'t reach the server. Please try again.'); }
+    if (!res.ok) throw new Error(res.error || 'Something went wrong. Please try again.');
+    try { localStorage.setItem('xii-party-rsvp', JSON.stringify({ name: data.name, email: data.email, phone: data.phone, office: data.office })); } catch (e) {}
+    const first = esc(data.name.split(' ')[0]);
+    const upd = res.updated ? 'Your RSVP was updated. ' : '';
+    $('successTitle').innerHTML = yes ? `You're on the list, ${first}.` : `Thanks for letting us know, ${first}.`;
+    $('successMsg').textContent = yes
+      ? upd + (data.guestName ? `${data.guestName} is on the list too. ` : '') + 'Arrive by 7:30 — doors close on time. Bring warm layers.'
+      : upd + "We'll miss you. If plans change, just RSVP again.";
+    $('successWarning').style.display = yes ? '' : 'none';
+    $('formView').style.display = 'none';
+    $('successView').style.display = 'block';
+    loadHeadcount();
+  } catch (err) {
+    showError(err instanceof TypeError ? 'Couldn\'t reach the server. Check your connection and try again.' : err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send RSVP';
+  }
+});
+
+render();
+loadHeadcount();
+</script>
+</body>
+</html>
